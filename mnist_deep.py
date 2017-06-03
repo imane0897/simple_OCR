@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.python.framework import graph_util
 from tensorflow.examples.tutorials.mnist import input_data
 
-# --- Build a Multilayer Convolutional Network ---
+# --- Build a Multilayer Convolutional Network --- #
 
 # Weight Initialization
 def weight_variable(shape):
