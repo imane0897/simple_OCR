@@ -30,7 +30,7 @@
 
 ​	自适应阈值是根据像素的邻域块的像素值分布来确定该像素位置上的二值化阈值。在灰度图像中，灰度值变化明显的区域往往是物体的轮廓，采用自适应阈值的好处在于每个像素位置处的二值化阈值不是固定不变的，而是由其周围邻域像素的分布来决定的。亮度较高的图像区域的二值化阈值通常会较高，而亮度较低的图像区域的二值化阈值则会相适应地变小。不同亮度、对比度、纹理的局部图像区域将会拥有相对应的局部二值化阈值。常用的局部自适应阈值有：(1). 局部邻域块的均值 (2). 局部邻域块的高斯加权和。
 
-![adaptive_threshold.png](https://ooo.0o0.ooo/2017/06/04/593392921baa5.png)
+​                                    ![adaptive_threshold.png](https://ooo.0o0.ooo/2017/06/04/593392921baa5.png)
 
 #### 2.1.3 Otsu
 
@@ -50,7 +50,7 @@
 
 ​	效果图为：
 
-![dilation.png](https://ooo.0o0.ooo/2017/06/04/5933a477af906.png)
+​                                  ![dilation.png](https://ooo.0o0.ooo/2017/06/04/5933a477af906.png)
 
 ​	腐蚀和膨胀是一对相反的操作，也就是求局部最小值的操作。腐蚀的数学表达式为：
 
@@ -58,11 +58,9 @@
 
 ​	效果图为：
 
-![erosion.png](https://ooo.0o0.ooo/2017/06/04/5933a6b4b76b2.png)
+​                                   ![erosion.png](https://ooo.0o0.ooo/2017/06/04/5933a6b4b76b2.png)
 
-​	膨胀与腐蚀的原理图为：
-
-​	![屏幕快照 2017-06-04 下午2.33.06.png](https://ooo.0o0.ooo/2017/06/04/5933a9c750106.png)
+​	膨胀与腐蚀的原理图为：![屏幕快照 2017-06-04 下午2.33.06.png](https://ooo.0o0.ooo/2017/06/04/5933a9c750106.png)
 
 
 
@@ -70,19 +68,19 @@
 
 ​	形态学的高级形态，如开运算、闭运算、形态学梯度、顶帽等是建立在腐蚀与膨胀的基础之上的。开运算（Opening Operation），其实就是先腐蚀后膨胀的过程。其数学表达式如下：
 
-​							$dst = open(src, element)  = dilate(erode(src, element))$
+​				$dst = open(src, element)  = dilate(erode(src, element))$
 
 ​	开运算可以用来消除小物体、在纤细点处分离物体、平滑较大物体的边界的同时并不明显改变其面积。效果图为：
 
-![opening.png](https://ooo.0o0.ooo/2017/06/04/5933acc018e19.png)
+​                                                             ![opening.png](https://ooo.0o0.ooo/2017/06/04/5933acc018e19.png)
 
 ​	先膨胀后腐蚀的过程称为闭运算(Closing Operation)，其数学表达式如下：
 
-​						     $dst = close(src, element) = erode(dilate(src, element))$
+​				 $dst = close(src, element) = erode(dilate(src, element))$
 
 ​	闭运算能够排除小型黑色区域。效果图如下所示：
 
-![closing.png](https://ooo.0o0.ooo/2017/06/04/5933ad2b09144.png)
+​                                                             ![closing.png](https://ooo.0o0.ooo/2017/06/04/5933ad2b09144.png)
 
 
 
@@ -98,7 +96,27 @@
 
 ### 3.3 分字符
 
-​	对单词中的每个字符进行分割时使用的是轮廓检测方法，OpenCV 封装了这个函数 `findContours` 。轮廓（Contours），指的是有相同颜色或者密度，连接所有连续点的一条曲线。检测轮廓的工作对形状分析和物体检测与识别都非常有用。为了提高轮廓检测的准确性，在轮廓检测之前，首先要对图片进行二值化或者Canny边缘检测。
+​	对单词中的每个字符进行分割时使用的是轮廓检测方法，OpenCV 封装了这个函数 `findContours` 。轮廓（Contours），指的是有相同颜色或者密度，连接所有连续点的一条曲线。检测轮廓的工作对形状分析和物体检测与识别都非常有用。为了提高轮廓检测的准确性，在轮廓检测之前，首先要对图片进行二值化或者 Canny 边缘检测。函数的原型为：
+
+```python
+cv2.findContours(image, mode, method[, contours[, hierarchy[, offset ]]])  
+```
+
+- 第二个参数表示轮廓的检索模式，有四种：
+  - `cv2.RETR_EXTERNAL` 表示只检测外轮廓
+  - `cv2.RETR_LIST` 检测的轮廓不建立等级关系
+  - `cv2.RETR_CCOMP` 建立两个等级的轮廓，上面的一层为外边界，里面的一层为内孔的边界信息。如果内孔内还有一个连通物体，这个物体的边界也在顶层。
+  - `cv2.RETR_TREE` 建立一个等级树结构的轮廓。
+
+- 第三个参数 method 为轮廓的近似办法
+
+  - `cv2.CHAIN_APPROX_NONE` 存储所有的轮廓点，相邻的两个点的像素位置差不超过1，即 $max(abs(x_1-x_2), abs(y_2-y_1))=1$
+  - `cv2.CHAIN_APPROX_SIMPLE` 压缩水平方向，垂直方向，对角线方向的元素，只保留该方向的终点坐标，例如一个矩形轮廓只需4个点来保存轮廓信息
+  - `cv2.CHAIN_APPROX_TC89_L1`，`CV_CHAIN_APPROX_TC89_KCOS` 使用teh-Chinl chain 近似算法
+
+  由于检测目标是手写字母和数字，根据实际的需求，本代码中第二个参数选择的是 `cv2.RETR_EXTERNAL`  ，第三个参数选择的是  `cv2.CHAIN_APPROX_SIMPLE` 。
+
+​                                                       <img src="https://ooo.0o0.ooo/2017/06/04/5933c6d0bef26.png" alt="contours.png" title="contours.png" style="zoom:50%"/>
 
 
 
